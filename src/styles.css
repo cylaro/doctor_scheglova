@@ -35,12 +35,13 @@ em { font-weight: 400; }
 .icon { flex-shrink: 0; vertical-align: middle; }
 .site-shell { width: min(100% - 48px, 760px); margin: 28px auto 0; }
 .site-header { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 5px 19px; }
-.brand { display: flex; gap: 11px; align-items: center; text-decoration: none; font-weight: 600; font-size: 14px; min-width: 0; }
+.brand { display: flex; gap: 11px; align-items: center; text-decoration: none; font-weight: 600; font-size: 14px; line-height: 1.55; min-width: 0; }
 .brand > span:last-child { overflow-wrap: anywhere; }
 .brand-mark { display: grid; place-items: center; color: var(--teal); }
 .brand-mark .icon { width: 29px; height: 29px; }
 .header-note, .header-link { font-size: 11px; white-space: nowrap; color: #536b62; }
-.header-link { min-height: 44px; display: flex; align-items: center; }
+.header-link { min-height: 40px; display: flex; align-items: center; justify-content: center; padding: 9px 15px; border: 1px solid #adbdad; border-radius: 6px; background: transparent; color: var(--teal); text-decoration: none; font-weight: 600; flex-shrink: 0; }
+.header-link:hover { background: #dce8dd; border-color: #6b9484; }
 main { background: var(--paper); border-radius: 16px; overflow: clip; box-shadow: 0 12px 48px #244d3c0b; }
 .hero { position: relative; overflow: hidden; color: #f5f4e8; background: var(--teal); padding: 43px 49px 32px; }
 .hero-art { position: absolute; width: 410px; height: 574px; right: -48px; bottom: -41px; background: url('../public/assets/botanical.svg') center / contain no-repeat; opacity: .37; pointer-events: none; }
@@ -85,7 +86,8 @@ main { background: var(--paper); border-radius: 16px; overflow: clip; box-shadow
 .soft-note { display: flex; gap: 11px; padding: 17px 18px; background: var(--mint); border-radius: 6px; }
 .soft-note > .icon { width: 17px; height: 17px; color: #557261; margin-top: 2px; }
 .soft-note p { font-size: 11px; line-height: 1.8; color: #4e6657; }
-.author { padding: 25px 49px 28px; display: flex; gap: 14px; border-top: 1px solid var(--line); align-items: center; background: #f7f8f1; }
+.author { padding: 27px 49px 28px; border-top: 1px solid var(--line); background: #f7f8f1; }
+.author-profile { display: flex; gap: 16px; align-items: center; }
 .avatar { flex-shrink: 0; width: 53px; height: 53px; display: grid; place-items: center; border-radius: 50%; background: #e3ebdd; color: #547962; position: relative; overflow: hidden; }
 .avatar .icon { width: 28px; height: 28px; }
 .avatar img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
@@ -95,6 +97,28 @@ main { background: var(--paper); border-radius: 16px; overflow: clip; box-shadow
 .contact-links { display: flex; gap: 5px 15px; flex-wrap: wrap; margin-top: 5px; font-size: 11px; line-height: 1.8; }
 .contact-links a { color: var(--teal); overflow-wrap: anywhere; }
 .contact-links a:hover { color: #092f2c; }
+.contact-links a { min-height: 28px; display: inline-flex; align-items: center; }
+.author-bookings { margin-top: 23px; }
+.author-bookings:first-child { margin-top: 0; }
+.author-bookings .section-kicker { font-size: 9px; margin-bottom: 7px; }
+.booking-options { border-top: 1px solid #cedacb; }
+.booking-option { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 56px; padding: 15px 2px; color: var(--teal); border-bottom: 1px solid #cedacb; text-decoration: none; }
+.booking-option:hover { background: #e5eddf; }
+.booking-option > span { min-width: 0; }
+.booking-option strong { display: block; font-size: 13px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
+.booking-option small { display: block; margin-top: 4px; font-size: 11px; color: #5c6e60; line-height: 1.75; overflow-wrap: anywhere; }
+.booking-option > .icon { width: 17px; height: 17px; }
+.consultation .booking-options { margin-top: 21px; }
+.booking-dialog { width: min(480px, calc(100% - 32px)); max-height: calc(100dvh - 40px); padding: 25px 28px 28px; border: 1px solid #d6e0d0; border-radius: 12px; background: var(--paper); color: #283f3b; box-shadow: 0 20px 80px #102e3430; }
+.booking-dialog::backdrop { background: #15352ccc; }
+body:has(.booking-dialog[open]) { overflow: hidden; }
+.booking-dialog-top { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.booking-dialog-top .section-kicker { margin-bottom: 0; font-size: 9px; letter-spacing: 1.2px; }
+.dialog-close { display: grid; place-items: center; border: 0; background: transparent; border-radius: 50%; width: 40px; height: 40px; color: var(--teal); }
+.dialog-close:hover { background: var(--mint); }
+.dialog-close .icon { transform: rotate(45deg); }
+.booking-dialog h2 { color: var(--teal-dark); font-size: 27px; }
+.booking-dialog > p { margin: 13px 0 22px; color: #5c6e60; font-size: 12px; }
 .site-footer { padding: 20px 5px 30px; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; color: #586b5e; font-size: 10px; line-height: 1.8; }
 .site-footer a { white-space: nowrap; }
 .mobile-break { display: none; }
@@ -205,7 +229,7 @@ input:checked + .radio-mark .icon { opacity: 1; }
   .brand { font-size: 11px; gap: 8px; }
   .brand-mark .icon { width: 25px; height: 25px; }
   .header-note, .header-link { font-size: 9px; }
-  .header-link { min-height: 32px; }
+  .header-link { min-height: 38px; font-size: 10px; padding: 8px 11px; }
   main { border-radius: 12px; }
   .hero { padding: 32px 26px 25px; }
   .hero-art { width: 310px; height: 434px; right: -125px; bottom: 33px; opacity: .31; }
@@ -237,11 +261,14 @@ input:checked + .radio-mark .icon { opacity: 1; }
   .soft-note { padding: 15px 13px; gap: 9px; }
   .soft-note p { font-size: 11px; line-height: 1.85; }
   .soft-note .icon { width: 15px; height: 15px; }
-  .author { padding: 22px 25px; gap: 12px; align-items: flex-start; }
-  .avatar { width: 43px; height: 43px; }
+  .author { padding: 23px 25px; }
+  .author-profile { gap: 13px; align-items: flex-start; }
+  .avatar { width: 52px; height: 52px; }
   .avatar .icon { width: 25px; height: 25px; }
-  .author-info strong { font-size: 11px; }
-  .author-info p, .contact-links { font-size: 10px; }
+  .author-info strong { font-size: 12px; }
+  .author-info p, .contact-links { font-size: 11px; }
+  .booking-dialog { padding: 19px 22px 24px; }
+  .booking-dialog h2 { font-size: 25px; }
   .site-footer { padding: 17px 5px 24px; gap: 10px; font-size: 9px; }
   .mobile-break { display: block; }
   .content-screen { padding: 19px 24px 27px; }

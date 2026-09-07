@@ -11,8 +11,33 @@ let answers = Array(questions.length).fill(null);
 let questionIndex = 0;
 let toastTimer;
 
-const avatar = () => `<span class="avatar">${icon('leaf')}${config.doctor.avatar ? `<img src="${escape(config.doctor.avatar)}" alt="${escape(config.doctor.name || 'Фото специалиста')}" width="56" height="56" />` : ''}</span>`;
+const avatar = () => config.doctor.avatar ? `<span class="avatar">${icon('leaf')}<img src="${escape(config.doctor.avatar)}" alt="${escape(config.doctor.name || 'Фото специалиста')}" width="56" height="56" /></span>` : '';
 const doctorName = config.doctor.name || config.brandName;
+
+function bookingOptions() {
+  return `<div class="booking-options">${config.bookingLinks.map((item) => `<a class="booking-option" href="${escape(item.url)}"${external(item.url)}><span><strong>${escape(item.label)}</strong>${item.description ? `<small>${escape(item.description)}</small>` : ''}</span>${icon('arrow')}</a>`).join('')}</div>`;
+}
+
+function bookingAction(className, label = 'Записаться на консультацию') {
+  if (!bookingHref) return '';
+  return config.bookingLinks.length > 1
+    ? `<button type="button" class="${className}" data-action="booking" aria-haspopup="dialog">${escape(label)}</button>`
+    : link(bookingHref, label, className);
+}
+
+function setupBookingDialog() {
+  if (config.bookingLinks.length < 2) return;
+  const dialog = document.createElement('dialog');
+  dialog.id = 'booking-dialog';
+  dialog.className = 'booking-dialog';
+  dialog.setAttribute('aria-labelledby', 'booking-title');
+  dialog.innerHTML = `<div class="booking-dialog-top"><span class="section-kicker">ЗАПИСЬ НА КОНСУЛЬТАЦИЮ</span><form method="dialog"><button class="dialog-close" aria-label="Закрыть">${icon('plus')}</button></form></div><h2 id="booking-title">Выберите место приёма</h2><p>Перейдите на страницу записи в удобной для вас клинике или сервисе.</p>${bookingOptions()}`;
+  dialog.addEventListener('click', (event) => {
+    const box = dialog.getBoundingClientRect();
+    if (event.target === dialog && (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom)) dialog.close();
+  });
+  document.body.append(dialog);
+}
 
 function contactLinks() {
   return [
@@ -23,19 +48,24 @@ function contactLinks() {
   ].filter(Boolean).join('');
 }
 
-function author() {
-  return `<aside class="author" aria-label="О специалисте">
-    ${avatar()}<div class="author-info"><strong>${escape(doctorName)}</strong>
-    <p>${escape(config.doctor.specialty || 'Цикл, самочувствие и менопауза')}</p>
+function author(showBookings = true) {
+  const contacts = contactLinks();
+  const hasProfile = Object.values(config.doctor).some(Boolean) || contacts || config.address;
+  const hasBookings = showBookings && config.bookingLinks.length;
+  if (!hasProfile && !hasBookings) return '';
+  return `<aside class="author" aria-label="Специалист и запись">
+    ${hasProfile ? `<div class="author-profile">${avatar()}<div class="author-info">${config.doctor.name ? `<strong>${escape(config.doctor.name)}</strong>` : ''}
+    ${config.doctor.specialty ? `<p>${escape(config.doctor.specialty)}</p>` : ''}
     ${config.doctor.description ? `<p>${escape(config.doctor.description)}</p>` : ''}
-    ${contactLinks() ? `<div class="contact-links">${contactLinks()}</div>` : ''}
-    ${config.address ? `<p class="address">${escape(config.address)}</p>` : ''}</div>
+    ${contacts ? `<div class="contact-links">${contacts}</div>` : ''}
+    ${config.address ? `<p class="address">${escape(config.address)}</p>` : ''}</div></div>` : ''}
+    ${hasBookings ? `<div class="author-bookings"><p class="section-kicker">ЗАПИСЬ НА КОНСУЛЬТАЦИЮ</p>${bookingOptions()}</div>` : ''}
   </aside>`;
 }
 
 function chrome() {
   $('#site-header').innerHTML = `<a class="brand" href="#" aria-label="${escape(doctorName)} — на главную"><span class="brand-mark">${icon('leaf')}</span><span>${escape(doctorName)}</span></a>
-    ${bookingHref ? link(bookingHref, 'Связаться', 'header-link') : '<span class="header-note">5 вопросов · 2 минуты</span>'}`;
+    ${bookingHref ? bookingAction('header-link', config.bookingLinks.length ? 'Записаться' : 'Связаться') : '<span class="header-note">5 вопросов · 2 минуты</span>'}`;
   $('#site-footer').innerHTML = `<span>Информация для заботы о себе.<br class="mobile-break" /> Не заменяет консультацию врача.</span><a href="#privacy">О ваших данных</a>`;
   document.title = `Гормональные изменения — ${doctorName}`;
   $('meta[property="og:title"]').content = `Тест о гормональных изменениях | ${doctorName}`;
@@ -109,7 +139,7 @@ function sourceDetails() {
 
 function consultation(fromQuiz) {
   return `<aside class="consultation"><span class="section-kicker">СЛЕДУЮЩИЙ ШАГ</span><h2>${bookingHref ? 'Обсудим то, что вас беспокоит' : 'Подготовьтесь к разговору с врачом'}</h2><p>${bookingHref ? 'На консультации можно разобраться в причинах изменений и подобрать помощь с учётом вашего самочувствия.' : 'Вспомните, когда появились изменения, запишите даты менструаций и названия препаратов, которые принимаете.'}</p>
-    ${bookingHref ? link(bookingHref, 'Записаться на консультацию', 'button button-teal') : fromQuiz ? `<button class="button button-teal" data-action="save">${icon('download')} Сохранить результат</button>` : ''}
+    ${config.bookingLinks.length > 1 ? bookingOptions() : bookingHref ? bookingAction('button button-teal') : fromQuiz ? `<button class="button button-teal" data-action="save">${icon('download')} Сохранить результат</button>` : ''}
   </aside>`;
 }
 
@@ -129,7 +159,7 @@ function result() {
     <div class="result-tools">${bookingHref ? `<button class="text-button" data-action="save">${icon('download')} Сохранить результат</button>` : ''}<button class="text-button" data-action="share">${icon('share')} Поделиться тестом</button></div>
     <div id="share-fallback" hidden></div>
     ${sourceDetails()}<div class="end-navigation"><button class="text-button" data-action="restart">Пройти заново</button><a href="#">На главную</a></div></div>
-    ${author()}
+    ${author(false)}
   </section>`;
 }
 
@@ -139,7 +169,7 @@ function stagePicker() {
 
 function stageDetail(key) {
   const stage = stages.find((item) => item.key === key);
-  return `<article class="content-screen stage-detail"><a class="text-back" href="#stages">${icon('back')} Все периоды</a><div class="section-kicker">${stage.number} / ${escape(stage.label)}</div><h1 id="page-title" tabindex="-1">${escape(stage.title)}</h1><p class="page-lead">${escape(stage.summary)}</p><section class="result-section"><h2>Что происходит</h2>${stage.paragraphs.map((paragraph) => `<p>${escape(paragraph)}</p>`).join('')}</section><section class="result-section"><h2>На что обратить внимание</h2>${stepsMarkup(stage.steps)}</section><div class="soft-note">${icon('info')}<p>${escape(stage.note)}</p></div>${consultation(false)}${sourceDetails()}${answers.every(Boolean) ? '<a class="related-stage" href="#result">Вернуться к результату' + icon('arrow') + '</a>' : '<button class="text-button" data-action="start">Пройти тест' + icon('arrow') + '</button>'}</article>${author()}`;
+  return `<article class="content-screen stage-detail"><a class="text-back" href="#stages">${icon('back')} Все периоды</a><div class="section-kicker">${stage.number} / ${escape(stage.label)}</div><h1 id="page-title" tabindex="-1">${escape(stage.title)}</h1><p class="page-lead">${escape(stage.summary)}</p><section class="result-section"><h2>Что происходит</h2>${stage.paragraphs.map((paragraph) => `<p>${escape(paragraph)}</p>`).join('')}</section><section class="result-section"><h2>На что обратить внимание</h2>${stepsMarkup(stage.steps)}</section><div class="soft-note">${icon('info')}<p>${escape(stage.note)}</p></div>${consultation(false)}${sourceDetails()}${answers.every(Boolean) ? '<a class="related-stage" href="#result">Вернуться к результату' + icon('arrow') + '</a>' : '<button class="text-button" data-action="start">Пройти тест' + icon('arrow') + '</button>'}</article>${author(false)}`;
 }
 
 function privacy() {
@@ -188,7 +218,7 @@ function notify(message) {
 function saveResult() {
   if (!answers.every(Boolean)) return;
   const result = getResult(answers);
-  const text = [config.brandName, result.title, result.summary, '', 'НА ЧТО УКАЗЫВАЮТ ОТВЕТЫ', ...result.reasons.map((s) => `• ${s}`), '', 'ЧТО МОЖНО СДЕЛАТЬ', ...result.steps.map((s, i) => `${i + 1}. ${s.title}\n${s.text}`), '', 'ВАШИ ОТВЕТЫ', ...questions.map((q, i) => `${q.title}\n${q.options.find((o) => o.id === answers[i]).label}`), '', result.note, '', ...sources.map((s) => `${s.label}: ${s.url}`), config.doctor.name, config.doctor.specialty, config.phoneHref ? config.phone : '', config.telegram, config.whatsapp, config.emailHref ? config.email : '', config.bookingUrl, config.address].join('\n');
+  const text = [config.brandName, result.title, result.summary, '', 'НА ЧТО УКАЗЫВАЮТ ОТВЕТЫ', ...result.reasons.map((s) => `• ${s}`), '', 'ЧТО МОЖНО СДЕЛАТЬ', ...result.steps.map((s, i) => `${i + 1}. ${s.title}\n${s.text}`), '', 'ВАШИ ОТВЕТЫ', ...questions.map((q, i) => `${q.title}\n${q.options.find((o) => o.id === answers[i]).label}`), '', result.note, '', ...sources.map((s) => `${s.label}: ${s.url}`), config.doctor.name, config.doctor.specialty, config.phoneHref ? config.phone : '', config.telegram, config.whatsapp, config.emailHref ? config.email : '', ...config.bookingLinks.map(item => `${item.label}: ${item.url}`), config.address].join('\n');
   const url = URL.createObjectURL(new Blob(['\uFEFF' + text], { type: 'text/plain;charset=utf-8' }));
   const anchor = document.createElement('a');
   anchor.href = url; anchor.download = 'rezultat-testa.txt';
@@ -249,8 +279,10 @@ document.addEventListener('click', (event) => {
   if (action === 'restart') { answers = Array(questions.length).fill(null); navigate('#test/1'); }
   if (action === 'save') saveResult();
   if (action === 'share') shareQuiz();
+  if (action === 'booking') $('#booking-dialog')?.showModal();
 });
 
 window.addEventListener('hashchange', render);
 chrome();
+setupBookingDialog();
 render();
