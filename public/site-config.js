@@ -30,14 +30,14 @@ window.SITE_CONFIG = {
       },
       {
         label: 'МЦ «Небольница»',
-        url: 'https://ogni.clinic/doctors/shcheglova_svetlana_vyacheslavovna',
+        url: 'https://nebolnica.ru/specialisty/ginekologi-v-voronezhe/shheglova-svetlana-vjacheslavovna/',
         description: '',
       },      
       {
         label: 'МЦ «Грани»',
-        url: 'https://ogni.clinic/doctors/shcheglova_svetlana_vyacheslavovna',
+        url: 'https://booking.medflex.ru/?user=0cc03b8281f994c949116a953748d31d&employeeId=127511&source=4',
         description: '',
-      },
+      }
      
     ],
     address: '',                    // Адрес клиники, если нужен
