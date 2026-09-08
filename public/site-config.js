@@ -24,11 +24,21 @@ window.SITE_CONFIG = {
     // Можно удалить любой блок, отдельные поля или весь список.
     bookingLinks: [
       {
-        label: 'Клиника «Огни»',
+        label: 'Клиника «Огни Олимпа»',
         url: 'https://ogni.clinic/doctors/shcheglova_svetlana_vyacheslavovna',
         description: '',
       },
-      // Для второго места скопируйте блок выше и поменяйте название и ссылку.
+      {
+        label: 'МЦ «Небольница»',
+        url: 'https://ogni.clinic/doctors/shcheglova_svetlana_vyacheslavovna',
+        description: '',
+      },      
+      {
+        label: 'МЦ «Грани»',
+        url: 'https://ogni.clinic/doctors/shcheglova_svetlana_vyacheslavovna',
+        description: '',
+      },
+     
     ],
     address: '',                    // Адрес клиники, если нужен
   },
